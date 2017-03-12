@@ -7,15 +7,35 @@ except:
 
 current = connection.cursor()
 
-current.execute("""SELECT * FROM application""")
-rows = current.fetchall()
-companies = {}
-for row in rows:
-	companies[row[0]] = row[1]
-# companies = [row[1] for row in rows]
+def get_companies_dict(curr):
+	"""
+	Get dictionary of companies applied to and corresponding primary keys
+	"""
+	curr.execute("""SELECT * FROM application""")
+	rows = curr.fetchall()
+	companies = {}
+	for row in rows:
+		companies[row[0]] = row[1]
+	return companies
 
-current.execute("""SELECT * FROM first_screen""")
-rows = current.fetchall()
-screens = [companies[row[0]] for row in rows]
+def get_entries(curr, query_of_interest, companies_applied_to):
+	""" 
+	Get list of companies for a certain category of entries
+	"""
 
-print screens
+	curr.execute("""SELECT * FROM """ + query_of_interest)
+	rows = curr.fetchall()
+	entries = [companies_applied_to[row[0]] for row in rows]
+	return entries
+
+companies = get_companies_dict(current)
+
+first_screens = get_entries(current, 'first_screen', companies)
+
+code_challenges = get_entries(current, 'code_challenge', companies)
+
+onsites = get_entries(current, 'onsite', companies)
+
+tech_screens = get_entries(current, 'technical_screen', companies)
+
+offers = get_entries(current, 'offer', companies)
